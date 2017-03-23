@@ -1,7 +1,8 @@
 (* Author: Dang Ha The Hien 
    Date:   13/03/2017
    Last Modified: 13/03/2017
-   Define a set of datatype that allows ADATE to generate an arbitrary tensorflow computation graph.
+   Define a set of datatype that allows ADATE to generate 
+            an arbitrary tensorflow computation graph.
    Note: do not take into account the batch-size dimension of a tensor
 *)
 exception NA1   (*NotImplemented*)
