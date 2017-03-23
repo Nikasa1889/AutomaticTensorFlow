@@ -190,3 +190,5 @@ fun multiply (tensor_nil, _) = raise TensorNil
 fun f (a: input_tensor) = 
     toOutput(fromInput(a))
 
+val inputTensor = tensor_c(nil, placeholder_c, dim_1(20))
+f(inputTensor)
