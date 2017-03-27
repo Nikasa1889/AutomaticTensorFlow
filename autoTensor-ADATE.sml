@@ -16,6 +16,9 @@ signature TENSOR = sig
     type tensor_list
     type input_tensor
     type output_tensor
+    datatype output_tensor_list: nil | c of output_tensor * output_tensor_list
+    
+    val c:            output_tensor * output_tensor_list -> output_tensor_list
     
     val fromInput:    input_tensor      -> tensor
     val toOutput:     tensor            -> output_tensor
@@ -32,8 +35,20 @@ signature TENSOR = sig
     val add:          tensor * tensor   -> tensor
     val multiply:     tensor * tensor   -> tensor
     val substract:    tensor * tensor   -> tensor
+    (*allow averaging prediction of multiple path*)
+    val averageOutput: output_tensor_list -> output_tensor 
 end
-
+val Funs_to_use = [ 
+  "false", "true", 
+  "numberLess", 
+  "numberTimes", "numberAdd", "numberMinus",
+  "positive", "negative",
+  "nil", "c", (*able to construct list of output_tensor*)
+  "fromInput", "toOutput", "averageOutput",
+  "fullyConnect", "split", "head", "tail", "concat",
+  "relu", "tanh", "sigmoid", "sqrt", "dropout",
+  "dropout", "add", "multiply", "substract"]
+  
 datatype dim = dim_1 of int | dim_2 of int * int | dim_3 of int * int * int
 datatype operation = placeholder_c
                 | fullyConnect_c of dim
@@ -56,11 +71,13 @@ datatype operation = placeholder_c
                 | add_c
                 | multiply_c
                 | substract_c
+                | averageOutput_c
                 (*| maximum_c*)
 datatype tensor_list = nil | c of tensor * tensor_list
 and tensor = tensor_nil | tensor_cons of int * tensor_list * operation * dim
 type input_tensor = tensor
 type output_tensor = tensor
+type output_tensor_list = tensor_list
 
 val tensor_id = ref 0
 fun generateId () =
@@ -200,6 +217,10 @@ fun multiply (Input1 as tensor_nil, Input2) = raise NA4
             true => raise NA2
            |false => tensor_c (c(Input1, c(Input2, nil)), multiply_c, dim_1(n1)))
    |multiply (Input1, Input2)  = raise NA1
+fun averageOutput (nil) = raise NA4
+   |averageOutput (TensorList as c(T as tensor_cons(ID, Parents, Oper, dim_1(n)), Ts)) 
+                        = tensor_c(TensorList, averageOutput_c, dim_1(n))
+   |averageOutput (TensorList) = raise NA1
 
 fun f (a: input_tensor) = 
     toOutput(fromInput(a))

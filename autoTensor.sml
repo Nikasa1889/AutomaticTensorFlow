@@ -15,6 +15,9 @@ signature TENSOR = sig
     type tensor_list
     type input_tensor
     type output_tensor
+    datatype output_tensor_list: nil | c of output_tensor * output_tensor_list
+    
+    val c:            output_tensor * output_tensor_list -> output_tensor_list
     
     val fromInput:    input_tensor      -> tensor
     val toOutput:     tensor            -> output_tensor
@@ -31,6 +34,8 @@ signature TENSOR = sig
     val add:          tensor * tensor   -> tensor
     val multiply:     tensor * tensor   -> tensor
     val substract:    tensor * tensor   -> tensor
+    (*allow averaging prediction of multiple path*)
+    val averageOutput: output_tensor_list -> output_tensor 
 end
 
 datatype dim = dim_1 of int | dim_2 of int * int | dim_3 of int * int * int
@@ -53,11 +58,13 @@ datatype operation = placeholder_c
                 | add_c
                 | multiply_c
                 | substract_c
+                | averageOutput_c
                 (*| maximum_c*)
 datatype tensor_list = nil | c of tensor * tensor_list
 and tensor = tensor_nil | tensor_cons of int * tensor_list * operation * dim
 type input_tensor = tensor
 type output_tensor = tensor
+type output_tensor_list = tensor_list
 
 val tensor_id = ref 0
 fun generateId () =
@@ -186,9 +193,21 @@ fun multiply (tensor_nil, _) = raise TensorNil
             else tensor_c (c(input1, c(input2, nil)), multiply_c, dim_1(n1))
    |multiply (_, _)  = raise NotImplemented
 
-
+fun averageOutput (nil) = raise TensorNil
+   |averageOutput (TensorList as c(T as tensor_cons(ID, Parents, Oper, dim_1(n)), Ts)) 
+                        = tensor_c(TensorList, averageOutput_c, dim_1(n))
+   |averageOutput (TensorList) = raise NotImplemented
+   
 fun f (a: input_tensor) = 
     toOutput(fromInput(a))
 
 val inputTensor = tensor_c(nil, placeholder_c, dim_1(20))
 f(inputTensor)
+(* Translate tensor datatype to string *)
+open Array
+fun convertTensorToTf ( FinalTensor as tensor_c(ID, Parents, Oper, dim_1(n)) = 
+    let
+        
+    in
+    end
+    
