@@ -176,8 +176,8 @@ fun dropout (Input as tensor_nil, KeepRate) = raise NA4
                     
 fun add (Input1 as tensor_nil, Input2) = raise NA4
    |add (Input1, Input2 as tensor_nil) = raise NA4
-   |add (Input1 as tensor_cons (ID1, Parents1, Oper1, dim_1(n1)), 
-         Input2 as tensor_cons (ID2, Parents2, Oper2, dim_1(n2))) =
+   |add (Input1 as tensor_cons (ID1, Parents1, Oper1, InputDim1 as dim_1(n1)), 
+         Input2 as tensor_cons (ID2, Parents2, Oper2, InputDim2 as dim_1(n2))) =
         (case (n1 <> n2) of
             true => raise NA2
            |false => tensor_c (c(Input1, c(Input2, nil)), add_c, dim_1(n1)))
@@ -185,8 +185,8 @@ fun add (Input1 as tensor_nil, Input2) = raise NA4
 
 fun substract (Input1 as tensor_nil, Input2) = raise NA4
    |substract (Input1, Input2 as tensor_nil) = raise NA4
-   |substract (Input1 as tensor_cons (ID1, Parents1, Oper1, dim_1(n1)), 
-               Input2 as tensor_cons (ID2, Parents2, Oper2, dim_1(n2))) =
+   |substract (Input1 as tensor_cons (ID1, Parents1, Oper1, InputDim1 as dim_1(n1)), 
+               Input2 as tensor_cons (ID2, Parents2, Oper2, InputDim2 as dim_1(n2))) =
         (case (n1 <> n2) of 
             true => raise NA2
            |false => tensor_c(c(Input1, c(Input2, nil)), substract_c, dim_1(n1)))
