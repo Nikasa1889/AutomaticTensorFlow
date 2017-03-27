@@ -1,6 +1,6 @@
 (* Author: Dang Ha The Hien 
    Date:   13/03/2017
-   Last Modified: 13/03/2017
+   Last Modified: 27/03/2017
    Define a set of datatype that allows ADATE to generate an arbitrary tensorflow computation graph.
    Note: do not take into account the batch-size dimension of a tensor
 *)
@@ -40,14 +40,14 @@ end
 
 datatype dim = dim_1 of int | dim_2 of int * int | dim_3 of int * int * int
 datatype operation = placeholder_c
-                | fullyConnect_c of dim
-                | softmax_c of dim
+                | fullyConnect_c
+                | softmax_c
                 (*| conv2d_c of  (int * int) * int * int (* kernel_size * strides * padding *)
                 | max_pool_c of (int * int) * int * int (* kernel_size * strides * padding *) *)
-                | head_c of dim
-                | tail_c of dim
-                | splitR_c of dim (* percentage of the first *)
-                | splitL_c of dim 
+                | head_c
+                | tail_c
+                | splitR_c (* percentage of the first *)
+                | splitL_c
                 | concat_c
                 | relu_c
                 | tanh_c
@@ -69,7 +69,9 @@ type output_tensor_list = tensor_list
 val tensor_id = ref 0
 fun generateId () =
     (tensor_id := !tensor_id + 1;!tensor_id)
-
+fun resetId () =
+    (tensor_id := 0)
+    
 fun tensor_c (tensors, oper, inputDim) : tensor = tensor_cons (generateId(), tensors, oper, inputDim)
     
 fun fromInput tensor_nil = raise TensorNil
@@ -82,7 +84,7 @@ fun toOutput tensor_nil = raise TensorNil
         val outputDim = dim_1(10) (* Specify the required tensor output dimension here, only support 1D output now *)
    in
         case inputDim of
-            dim_1 (n) => tensor_c (c (inputTensor, nil), softmax_c (outputDim), outputDim) (* only for classification now *)
+            dim_1 (n) => tensor_c (c (inputTensor, nil), softmax_c, outputDim) (* only for classification now *)
            |dim_2 (n) => raise NotImplemented
            |dim_3 (n) => raise NotImplemented
    end
@@ -92,7 +94,7 @@ fun fullyConnect (tensor_nil, _) = raise TensorNil
                     let 
                         val outDim = dim_1(floor(real(n) * scaleFactor))
                     in
-                        tensor_c (c(inputTensor, nil), fullyConnect_c( outDim ), outDim)
+                        tensor_c (c(inputTensor, nil), fullyConnect_c, outDim)
                     end
    |fullyConnect (inputTensor as tensor_cons (_, _, _, dim_2(nrows, ncolumns)), scaleFactor) = 
                     raise NotImplemented
@@ -107,8 +109,8 @@ fun split (tensor_nil, _) = raise TensorNil
                         val outDim1 = dim_1( floor(real(n) * splitFactor))
                         val outDim2 = dim_1( n - floor(real(n) * splitFactor))
                     in
-                       ( tensor_c (c (inputTensor, nil), splitR_c ( outDim1 ), outDim1),
-                         tensor_c (c (inputTensor, nil), splitL_c ( outDim2 ), outDim2))
+                       ( tensor_c (c (inputTensor, nil), splitR_c, outDim1),
+                         tensor_c (c (inputTensor, nil), splitL_c, outDim2))
                     end
    |split (inputTensor as tensor_cons (_, _, _, dim_2(nrows, ncolumns)), splitFactor) = raise NotImplemented
    |split (inputTensor as tensor_cons (_, _, _, dim_3(nrows, ncolumns, ndepths)), splitFactor) = raise NotImplemented
@@ -121,7 +123,7 @@ fun head (tensor_nil, _) = raise TensorNil
                     let
                         val outDim = dim_1( floor(nElems))
                     in
-                        tensor_c (c (inputTensor, nil), head_c ( outDim ), outDim)
+                        tensor_c (c (inputTensor, nil), head_c, outDim)
                     end
    |head (inputTensor as tensor_cons (_, _, _, dim_2(nrows, ncolumns)), nElems) = raise NotImplemented
    |head (inputTensor as tensor_cons (_, _, _, dim_3(nrows, ncolumns, ndepths)), nElems) = raise NotImplemented
@@ -133,7 +135,7 @@ fun tail (tensor_nil, _) = raise TensorNil
                     let
                         val outDim = dim_1( floor(nElems))
                     in
-                        tensor_c (c (inputTensor, nil), tail_c ( outDim ), outDim)
+                        tensor_c (c (inputTensor, nil), tail_c, outDim)
                     end
    |tail (inputTensor as tensor_cons (_, _, _, dim_2(nrows, ncolumns)), nElems) = raise NotImplemented
    |tail (inputTensor as tensor_cons (_, _, _, dim_3(nrows, ncolumns, ndepths)), nElems) = raise NotImplemented
@@ -201,13 +203,60 @@ fun averageOutput (nil) = raise TensorNil
 fun f (a: input_tensor) = 
     toOutput(fromInput(a))
 
-val inputTensor = tensor_c(nil, placeholder_c, dim_1(20))
-f(inputTensor)
+
 (* Translate tensor datatype to string *)
 open Array
-fun convertTensorToTf ( FinalTensor as tensor_c(ID, Parents, Oper, dim_1(n)) = 
+                
+fun convertTensorToTf ( FinalTensor as tensor_cons(ID, Parents, Oper, dim_1(n))) = 
     let
-        
+        val tfCommands = array(ID+1, "")
+        fun println (idx, str) = (print (Int.toString(idx) ^ ": " ^ str); print "\n")
+        fun tfCommand (ID, Oper, n, Parents as nil) = 
+              (case Oper of
+                 placeholder_c => update(tfCommands, ID, "placeholder_c dim_1 " ^ Int.toString(n))
+               | _ => raise NotImplemented) (*Only placeholder has no parents*)
+           |tfCommand (ID, Oper, n , Parents as c(tensor_cons(ParentID, _, _, _), nil)) =
+              ( case Oper of
+                  fullyConnect_c => update(tfCommands, ID, "fullyConnect_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |softmax_c      => update (tfCommands, ID, "softmax_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |head_c         => update (tfCommands, ID, "head_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |tail_c         => update (tfCommands, ID, "tail_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |splitR_c       => update (tfCommands, ID, "splitR_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |splitL_c       => update (tfCommands, ID, "splitL_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |relu_c         => update (tfCommands, ID, "relu_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |tanh_c         => update (tfCommands, ID, "tanh_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |sigmoid_c      => update (tfCommands, ID, "sigmoid_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |sqrt_c         => update (tfCommands, ID, "sqrt_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |dropout_c(r)   => update (tfCommands, ID, "dropout_c rate: " ^ Real.toString(r) ^ " dim_1" ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
+                 |_              => raise NotImplemented (*Only these operators have 1 parent tensor *)
+                )
+           |tfCommand (ID, Oper, n, Parents as c(tensor_cons(ParentID1, _, _, _), c(tensor_cons(ParentID2, _, _, _), nil))) = 
+              (case Oper of
+                   concat_c      => update (tfCommands, ID, "concat_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
+                  |add_c         => update (tfCommands, ID, "add_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
+                  |multiply_c    => update (tfCommands, ID, "multiply_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
+                  |substract_c   => update (tfCommands, ID, "substract_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
+                  | _            => raise NotImplemented (*Only these operators have 2 parent tensors*)   
+              )
+           | tfCommand (ID, Oper, n, Parents) =
+              (case Oper of
+                  averageOutput_c => update (tfCommands, ID, "averageOutput_c dim_1: " ^ Int.toString(n) )
+                 | _              => raise NotImplemented) (*Only these operators have a list of parents*)
+        fun tensorListToTfCommands (TensorList as nil) = ()
+           |tensorListToTfCommands (TensorList as c(T, Ts)) = 
+                (tensorToTfCommand(T); tensorListToTfCommands(Ts))
+        and tensorToTfCommand (Tensor as tensor_cons(ID, Parents, Oper, dim_1(n))) =
+                ( case String.compare(sub(tfCommands, ID), "") of
+                      EQUAL => (tfCommand(ID, Oper, n, Parents); tensorListToTfCommands(Parents))
+                     |_  => () )
+           |tensorToTfCommand (_) =  raise NotImplemented (*Do not support dim > 1 *)
+            
     in
+        (tensorToTfCommand(FinalTensor); appi println tfCommands)
     end
-    
+ | convertTensorToTf ( _ ) = raise NotImplemented; (* Do not support dim > 1 now *)
+
+resetId();
+val inputTensor = tensor_c(nil, placeholder_c, dim_1(20));
+val outTensor = f(inputTensor);
+convertTensorToTf(outTensor);
