@@ -124,8 +124,8 @@ fun split (Input as tensor_nil, SplitFactor) = raise NA4
                     true =>
                      (case dim_1( floor(real(n) * SplitFactor)) of OutDim1 =>
                       case dim_1( n - floor(real(n) * SplitFactor)) of OutDim2 =>
-                      (tensor_c (c (Input, nil), splitR_c, OutDim1),
-                       tensor_c (c (Input, nil), splitL_c, OutDim2)))
+                      (tensor_c (c (Input, nil), splitL_c, OutDim1),
+                       tensor_c (c (Input, nil), splitR_c, OutDim2)))
                    |false =>  raise NA3)
            |false => raise NA3
               
