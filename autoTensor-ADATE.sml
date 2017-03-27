@@ -1,6 +1,6 @@
 (* Author: Dang Ha The Hien 
    Date:   13/03/2017
-   Last Modified: 13/03/2017
+   Last Modified: 27/03/2017
    Define a set of datatype that allows ADATE to generate 
             an arbitrary tensorflow computation graph.
    Note: do not take into account the batch-size dimension of a tensor
@@ -70,13 +70,13 @@ fun tensor_c (Tensors, Op, InputDim) =
         tensor_cons (generateId(), Tensors, Op, InputDim)
     
 fun fromInput tensor_nil = raise NA4
-  | fromInput (tensor_cons(ID, nil, placeholder_c, InputDim)) = 
+  | fromInput (Input as tensor_cons(ID, nil, placeholder_c, InputDim)) = 
         tensor_c(nil, placeholder_c, InputDim)
-  | fromInput _ = raise NA1 
+  | fromInput (Input as tensor_cons(ID, Parents, Oper, InputDim)) = raise NA1 
    (* input tensor must have operation placeholder and has no dependency *)
     
 fun toOutput tensor_nil = raise NA4
-  | toOutput (InputTensor as tensor_cons (_, nodes, oper, InputDim)) = 
+  | toOutput (InputTensor as tensor_cons (ID, nodes, oper, InputDim)) = 
         (* Specify the required tensor output dimension here, 
         only support 1D output now *)
         case dim_1(10) of OutDim =>
@@ -84,24 +84,24 @@ fun toOutput tensor_nil = raise NA4
             case InputDim of
                 dim_1 (n) => tensor_c (c (InputTensor, nil), 
                                         softmax_c (OutDim), OutDim)
-               |dim_2 (_) => raise NA1
-               |dim_3 (_) => raise NA1
+               |dim_2 (n1, n2) => raise NA1
+               |dim_3 (n1, n2, n3) => raise NA1
 (* Define helper functions for all of the allowed tensor operations here *)
-fun fullyConnect (tensor_nil, _) = raise NA4
-  | fullyConnect (InputTensor as tensor_cons (_, _, _, dim_2(_)), ScaleFactor) =  
+fun fullyConnect (tensor_nil, OutDim) = raise NA4
+  | fullyConnect (InputTensor as tensor_cons (ID, Parents, Oper, dim_2(n1, n2)), ScaleFactor) =  
         raise NA1
-  | fullyConnect (InputTensor as tensor_cons (_, _, _, dim_3(_)), ScaleFactor) =  
+  | fullyConnect (InputTensor as tensor_cons (ID, Parents, Oper, dim_3(n1, n2, n3)), ScaleFactor) =  
         raise NA1
-  | fullyConnect (InputTensor as tensor_cons (_, _, _, dim_1(n)), ScaleFactor) = 
+  | fullyConnect (InputTensor as tensor_cons (ID, Parents, Oper, dim_1(n)), ScaleFactor) = 
         case dim_1(floor(real(n) * ScaleFactor)) of OutDim =>
             tensor_c (c(InputTensor, nil), fullyConnect_c( OutDim ), OutDim)
 
-fun split (tensor_nil, _) = raise NA4
-  | split (InputTensor as tensor_cons (_, _, _, dim_2(_)), SplitFactor) = 
+fun split (tensor_nil, SplitFactor) = raise NA4
+  | split (InputTensor as tensor_cons (ID, Parents, Oper, dim_2(n1, n2)), SplitFactor) = 
         raise NA1
-  | split (InputTensor as tensor_cons (_, _, _, dim_3(_)), SplitFactor) = 
+  | split (InputTensor as tensor_cons (ID, Parents, Oper, dim_3(n1, n2, n3)), SplitFactor) = 
         raise NA1
-  | split (InputTensor as tensor_cons (_, _, _, dim_1(n)), SplitFactor) =
+  | split (InputTensor as tensor_cons (ID, Parents, Oper, dim_1(n)), SplitFactor) =
         case (SplitFactor > 0.0) of
             true => (case (SplitFactor < 1.0) of
                     true =>
@@ -114,12 +114,12 @@ fun split (tensor_nil, _) = raise NA4
               
 
 
-fun head (tensor_nil, _) = raise NA4
-  | head (InputTensor as tensor_cons (_, _, _, dim_2(_)), nElems)=
+fun head (tensor_nil, nElems) = raise NA4
+  | head (InputTensor as tensor_cons (ID, Parents, Oper, dim_2(n1, n2)), nElems)=
         raise NA1
-  | head (InputTensor as tensor_cons (_, _, _, dim_3(_)), nElems) = 
+  | head (InputTensor as tensor_cons (ID, Parents, Oper, dim_3(n1, n2, n3)), nElems) = 
         raise NA1
-  | head (InputTensor as tensor_cons (_, _, _, dim_1(n)), nElems) =
+  | head (InputTensor as tensor_cons (ID, Parents, Oper, dim_1(n)), nElems) =
         case (nElems > 0.0) of
             true => (case (floor(nElems) < n) of
                      true =>
@@ -130,10 +130,10 @@ fun head (tensor_nil, _) = raise NA4
                 
 
 
-fun tail (tensor_nil, _) = raise NA4
-  | tail (InputTensor as tensor_cons (_, _, _, dim_2(_)), nElems) = raise NA1
-  | tail (InputTensor as tensor_cons (_, _, _, dim_3(_)), nElems) = raise NA1
-  | tail (InputTensor as tensor_cons (_, _, _, dim_1(n)), nElems) =
+fun tail (tensor_nil, nElems) = raise NA4
+  | tail (InputTensor as tensor_cons (ID, Parents, Oper, dim_2(n1, n2)), nElems) = raise NA1
+  | tail (InputTensor as tensor_cons (ID, Parents, Oper, dim_3(n1, n2, n3)), nElems) = raise NA1
+  | tail (InputTensor as tensor_cons (ID, Parents, Oper, dim_1(n)), nElems) =
         case (nElems > 0.0) of 
             true => (case (floor(nElems) < n) of
                     true =>
@@ -144,64 +144,64 @@ fun tail (tensor_nil, _) = raise NA4
                 
    
    
-fun concat (tensor_nil, _) = raise NA4
-   |concat (_, tensor_nil) = raise NA4
-   |concat (Input1 as tensor_cons (_, _, _, dim_1(n1)), 
-            Input2 as tensor_cons (_, _, _, dim_1(n2))) = 
+fun concat (tensor_nil, Input2) = raise NA4
+   |concat (Input1, tensor_nil) = raise NA4
+   |concat (Input1 as tensor_cons (ID1, Parents1, Oper1, dim_1(n1)), 
+            Input2 as tensor_cons (ID2, Parents2, Oper2, dim_1(n2))) = 
         (case dim_1(n1 + n2) of OutDim =>
             tensor_c (c(Input1, c(Input2, nil)), concat_c, OutDim))
-   |concat (_, _) = raise NA4
+   |concat (Input1, Input2) = raise NA4
                 
 fun relu (tensor_nil) = raise NA4
-   |relu (InputTensor as tensor_cons (_, _, _, InputDim)) = 
+   |relu (InputTensor as tensor_cons (ID, Parents, Oper, InputDim)) = 
         tensor_c (c(InputTensor, nil), relu_c, InputDim)
         
 fun sigmoid (tensor_nil) = raise NA4
-   |sigmoid (InputTensor as tensor_cons (_, _, _, InputDim)) = 
+   |sigmoid (InputTensor as tensor_cons (ID, Parents, Oper, InputDim)) = 
         tensor_c (c(InputTensor, nil), sigmoid_c, InputDim)
            
 fun tanh (tensor_nil) = raise NA4
-   |tanh (InputTensor as tensor_cons (_, _, _, InputDim)) = 
+   |tanh (InputTensor as tensor_cons (ID, Parents, Oper, InputDim)) = 
         tensor_c (c(InputTensor, nil), tanh_c, InputDim)
         
 fun sqrt (tensor_nil) = raise NA4
-   |sqrt (InputTensor as tensor_cons (_, _, _, InputDim)) = 
+   |sqrt (InputTensor as tensor_cons (ID, Parents, Oper, InputDim)) = 
         tensor_c (c(InputTensor, nil), sqrt_c, InputDim)
         
-fun dropout (tensor_nil, _) = raise NA4
-   |dropout (InputTensor as tensor_cons (_, _, _, InputDim), keepRate) = 
-        case (keepRate > 0.0) of
-            true => (case (keepRate < 1.0) of
-                     true => tensor_c (c(InputTensor, nil), dropout_c (keepRate), InputDim)
+fun dropout (tensor_nil, KeepRate) = raise NA4
+   |dropout (InputTensor as tensor_cons (ID, Parents, Oper, InputDim), KeepRate) = 
+        case (KeepRate > 0.0) of
+            true => (case (KeepRate < 1.0) of
+                     true => tensor_c (c(InputTensor, nil), dropout_c (KeepRate), InputDim)
                     |false => raise NA3)
            |false => raise NA3
                     
-fun add (tensor_nil, _) = raise NA4
-   |add (_, tensor_nil) = raise NA4
-   |add (Input1 as tensor_cons (_, _, _, dim_1(n1)), 
-         Input2 as tensor_cons (_, _, _, dim_1(n2))) =
+fun add (tensor_nil, Input2) = raise NA4
+   |add (Input1, tensor_nil) = raise NA4
+   |add (Input1 as tensor_cons (ID1, Parents1, Oper1, dim_1(n1)), 
+         Input2 as tensor_cons (ID2, Parents2, Oper2, dim_1(n2))) =
         (case (n1 <> n2) of
             true => raise NA2
            |false => tensor_c (c(Input1, c(Input2, nil)), add_c, dim_1(n1)))
-   |add (_, _)  = raise NA1
+   |add (Input1, Input2)  = raise NA1
 
-fun substract (tensor_nil, _) = raise NA4
-   |substract (_, tensor_nil) = raise NA4
-   |substract (Input1 as tensor_cons (_, _, _, dim_1(n1)), 
-               Input2 as tensor_cons (_, _, _, dim_1(n2))) =
+fun substract (tensor_nil, Input2) = raise NA4
+   |substract (Input1, tensor_nil) = raise NA4
+   |substract (Input1 as tensor_cons (ID1, Parents1, Oper1, dim_1(n1)), 
+               Input2 as tensor_cons (ID2, Parents2, Oper2, dim_1(n2))) =
         (case (n1 <> n2) of 
             true => raise NA2
            |false => tensor_c(c(Input1, c(Input2, nil)), substract_c, dim_1(n1)))
-   |substract (_, _)  = raise NA1
+   |substract (Input1, Input2)  = raise NA1
        
-fun multiply (tensor_nil, _) = raise NA4
-   |multiply (_, tensor_nil) = raise NA4
-   |multiply (Input1 as tensor_cons (_, _, _, dim_1(n1)), 
-              Input2 as tensor_cons (_, _, _, dim_1(n2))) =
+fun multiply (tensor_nil, Input2) = raise NA4
+   |multiply (Input1, tensor_nil) = raise NA4
+   |multiply (Input1 as tensor_cons (ID1, Parents1, Oper1, dim_1(n1)), 
+              Input2 as tensor_cons (ID2, Parents2, Oper2, dim_1(n2))) =
         (case (n1 <> n2) of
             true => raise NA2
            |false => tensor_c (c(Input1, c(Input2, nil)), multiply_c, dim_1(n1)))
-   |multiply (_, _)  = raise NA1
+   |multiply (Input1, Input2)  = raise NA1
 
 fun f (a: input_tensor) = 
     toOutput(fromInput(a))
