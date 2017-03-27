@@ -102,13 +102,16 @@ fun split (tensor_nil, _) = raise NA4
   | split (InputTensor as tensor_cons (_, _, _, dim_3(_)), SplitFactor) = 
         raise NA1
   | split (InputTensor as tensor_cons (_, _, _, dim_1(n)), SplitFactor) =
-        case (SplitFactor <= 0.0 orelse SplitFactor >= 1.0) of
-            true => raise NA3
-           |false =>
-              case dim_1( floor(real(n) * SplitFactor)) of OutDim1 =>
-              case dim_1( n - floor(real(n) * SplitFactor)) of OutDim2 =>
-               ( tensor_c (c (InputTensor, nil), splitR_c ( OutDim1 ), OutDim1),
-                 tensor_c (c (InputTensor, nil), splitL_c ( OutDim2 ), OutDim2))
+        case (SplitFactor > 0.0) of
+            true => (case (SplitFactor < 1.0) of
+                    true =>
+                     (case dim_1( floor(real(n) * SplitFactor)) of OutDim1 =>
+                      case dim_1( n - floor(real(n) * SplitFactor)) of OutDim2 =>
+                      (tensor_c (c (InputTensor, nil), splitR_c ( OutDim1 ), OutDim1),
+                       tensor_c (c (InputTensor, nil), splitL_c ( OutDim2 ), OutDim2)))
+                   |false =>  raise NA3)
+           |false => raise NA3
+              
 
 
 fun head (tensor_nil, _) = raise NA4
@@ -117,22 +120,28 @@ fun head (tensor_nil, _) = raise NA4
   | head (InputTensor as tensor_cons (_, _, _, dim_3(_)), nElems) = 
         raise NA1
   | head (InputTensor as tensor_cons (_, _, _, dim_1(n)), nElems) =
-        case (nElems <= 0.0 orelse floor(nElems) >= n) of
-            true => raise NA3
-           |false => 
-                case dim_1( floor(nElems)) of OutDim =>
-                    tensor_c (c (InputTensor, nil), head_c ( OutDim ), OutDim)
+        case (nElems > 0.0) of
+            true => (case (floor(nElems) < n) of
+                     true =>
+                       (case dim_1( floor(nElems)) of OutDim =>
+                        tensor_c (c (InputTensor, nil), head_c ( OutDim ), OutDim))
+                    |false => raise NA3)
+           |false => raise NA3
+                
 
 
 fun tail (tensor_nil, _) = raise NA4
   | tail (InputTensor as tensor_cons (_, _, _, dim_2(_)), nElems) = raise NA1
   | tail (InputTensor as tensor_cons (_, _, _, dim_3(_)), nElems) = raise NA1
   | tail (InputTensor as tensor_cons (_, _, _, dim_1(n)), nElems) =
-        case (nElems <= 0.0 orelse floor(nElems) >= n) of
-            true => raise NA3
-           |false =>
-                case dim_1( floor(nElems)) of OutDim =>
-                    tensor_c (c (InputTensor, nil), tail_c ( OutDim ), OutDim)
+        case (nElems > 0.0) of 
+            true => (case (floor(nElems) < n) of
+                    true =>
+                       (case dim_1( floor(nElems)) of OutDim =>
+                        tensor_c (c (InputTensor, nil), tail_c ( OutDim ), OutDim))
+                   |false => raise NA3)
+           |false => raise NA3
+                
    
    
 fun concat (tensor_nil, _) = raise NA4
@@ -161,9 +170,11 @@ fun sqrt (tensor_nil) = raise NA4
         
 fun dropout (tensor_nil, _) = raise NA4
    |dropout (InputTensor as tensor_cons (_, _, _, InputDim), keepRate) = 
-        case ((keepRate <=0.0) orelse (keepRate > 1.0)) of
-            true => raise NA3
-           |false => tensor_c (c(InputTensor, nil), dropout_c (keepRate), InputDim)
+        case (keepRate > 0.0) of
+            true => (case (keepRate < 1.0) of
+                     true => tensor_c (c(InputTensor, nil), dropout_c (keepRate), InputDim)
+                    |false => raise NA3)
+           |false => raise NA3
                     
 fun add (tensor_nil, _) = raise NA4
    |add (_, tensor_nil) = raise NA4
