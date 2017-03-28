@@ -354,7 +354,7 @@ fun convertTensorToTf ( FinalTensor as tensor_cons(ID, Parents, Oper, dim_1(n)))
     end
  | convertTensorToTf ( _ ) = raise NotImplemented; (* Do not support dim > 1 now *)
 
-resetId();
+val _ = resetId();
 val inputTensor = tensor_c(nil, placeholder_c, dim_1(20));
 val outTensor = f(inputTensor);
-convertTensorToTf(outTensor);
+val _ = convertTensorToTf(outTensor);
