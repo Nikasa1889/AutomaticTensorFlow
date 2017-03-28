@@ -1,0 +1,14 @@
+(* NeuralNetwork-Lib: Hiendht                                          
+
+*)
+Library
+	signature NN
+	structure NN
+is
+	$/basis.cm
+	$/smlnj-lib.cm
+	../matrix/sources.cm
+	../randomext/sources.cm
+	
+	NN.sig
+	NN.sml

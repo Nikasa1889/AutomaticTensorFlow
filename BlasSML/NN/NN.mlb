@@ -1,0 +1,10 @@
+local
+	$(SML_LIB)/smlnj-lib/Util/smlnj-lib.mlb
+	$(SML_LIB)/basis/basis.mlb
+	../matrix/matrix.mlb
+	../randomext/randomext.mlb
+	NN.sig
+	NN.sml
+in
+	structure NN
+end
