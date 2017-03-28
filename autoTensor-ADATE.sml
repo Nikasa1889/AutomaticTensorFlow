@@ -222,8 +222,26 @@ fun averageOutput (nil) = raise NA4
                         = tensor_c(TensorList, averageOutput_c, dim_1(n))
    |averageOutput (TensorList) = raise NA1
 
+
 fun f (a: input_tensor) = 
-    toOutput(fromInput(a))
+    let
+        val (x1, x2)= split(a, 0.5);
+        val x3 = head(x1, 2.0);
+        val x4 = tail(x2, 2.0);
+        val x5 = add(x3, x4);
+        val x6 = multiply( x1, x2)
+        val x7 = fullyConnect(x3, 2.0)
+        val x8 = relu(x7);
+        val x9 = concat(x5, x6);
+        val x10 = dropout(x8, 0.5)
+        val x11 = sigmoid(x10)
+        val y1 = toOutput(x11);
+        val y2 = toOutput(x9);
+        val y3 = toOutput(x1);
+        val y = averageOutput(c(y1, c(y2, c(y3, nil))));
+    in
+        y
+    end
 
 (*val InputTensor = tensor_c(nil, placeholder_c, dim_1(20))
   f(InputTensor)
@@ -238,11 +256,11 @@ fun convertTensorToTf ( FinalTensor as tensor_cons(ID, Parents, Oper, dim_1(n)))
     let
         val tfCommands = array(ID+1, "")
         fun println (idx, str) = (print (Int.toString(idx) ^ ": " ^ str); print "\n")
-        fun tfCommand (ID, Oper, n, Parents as nil) = 
+        fun tfCommandMock (ID, Oper, n, Parents as nil) = 
               (case Oper of
                  placeholder_c => update(tfCommands, ID, "placeholder_c dim_1 " ^ Int.toString(n))
-               | _ => raise NA1) (*Only placeholder has no parents*)
-           |tfCommand (ID, Oper, n , Parents as c(tensor_cons(ParentID, _, _, _), nil)) =
+               | _ => raise NotImplemented) (*Only placeholder has no parents*)
+           |tfCommandMock (ID, Oper, n , Parents as c(tensor_cons(ParentID, _, _, _), nil)) =
               ( case Oper of
                   fullyConnect_c => update(tfCommands, ID, "fullyConnect_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
                  |softmax_c      => update (tfCommands, ID, "softmax_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
@@ -255,20 +273,85 @@ fun convertTensorToTf ( FinalTensor as tensor_cons(ID, Parents, Oper, dim_1(n)))
                  |sigmoid_c      => update (tfCommands, ID, "sigmoid_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
                  |sqrt_c         => update (tfCommands, ID, "sqrt_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
                  |dropout_c(r)   => update (tfCommands, ID, "dropout_c rate: " ^ Real.toString(r) ^ " dim_1" ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID))
-                 |_              => raise NA1 (*Only these operators have 1 parent tensor *)
+                 |_              => raise NotImplemented (*Only these operators have 1 parent tensor *)
                 )
-           |tfCommand (ID, Oper, n, Parents as c(tensor_cons(ParentID1, _, _, _), c(tensor_cons(ParentID2, _, _, _), nil))) = 
+           |tfCommandMock (ID, Oper, n, Parents as c(tensor_cons(ParentID1, _, _, _), c(tensor_cons(ParentID2, _, _, _), nil))) = 
               (case Oper of
                    concat_c      => update (tfCommands, ID, "concat_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
                   |add_c         => update (tfCommands, ID, "add_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
                   |multiply_c    => update (tfCommands, ID, "multiply_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
                   |substract_c   => update (tfCommands, ID, "substract_c dim_1: " ^ Int.toString(n) ^ "; ParentID: " ^ Int.toString(ParentID1) ^ ", " ^ Int.toString(ParentID2))
-                  | _            => raise NA1 (*Only these operators have 2 parent tensors*)   
+                  | _            => raise NotImplemented (*Only these operators have 2 parent tensors*)   
+              )
+           |tfCommandMock (ID, Oper, n, Parents) =
+              (case Oper of
+                  averageOutput_c => update (tfCommands, ID, "averageOutput_c dim_1: " ^ Int.toString(n) )
+                 | _              => raise NotImplemented) (*Only these operators have a list of parents*)
+        fun tensorName (ID) = "tensor"^Int.toString(ID)
+        fun weightName (ID) = "W" ^ Int.toString(ID)
+        fun biasName (ID) = "B" ^ Int.toString(ID)
+        fun str(n) = Int.toString(n)
+        fun len(nil) = 0
+           |len(c(Tensor, TensorList)) = 1+len(TensorList)
+          
+        fun listTensor(TensorList) =
+            let
+                fun listT(nil) = "]"
+                   |listT(c(Tensor as tensor_cons(ID, _, _, _), TensorList)) = tensorName(ID) ^ ","^listT(TensorList)
+            in
+                "[" ^ listT(TensorList)
+            end
+        fun tfCommand (ID, Oper, n, Parents as nil) = 
+              (case Oper of
+                 placeholder_c => update(tfCommands, ID, tensorName(ID) ^ "= tf.placeholder(tf.float32, shape=(None, "^str(n)^"))")
+               | _ => raise NotImplemented) (*Only placeholder has no parents*)
+           |tfCommand (ID, Oper, n , Parents as c(tensor_cons(ParentID, _, _, dim_1(nParent)), nil)) =
+              ( case Oper of
+                  fullyConnect_c => update(tfCommands, ID, 
+                    weightName(ID) ^ "= tf.Variable (tf.truncated_normal([" ^ str(nParent) ^ ", " ^ str(n) ^"]), stddev = 1.0/math.sqrt(float(" ^ str(nParent)^ "))) \n" ^ 
+                    biasName(ID) ^ "= tf.Variable(tf.zeros(["^str(n)^"])) \n" ^
+                    tensorName(ID) ^ "= tf.matmul(" ^ tensorName(ParentID)^", "^weightName(ID)^") + "^ biasName(ID))
+                 |softmax_c      => update (tfCommands, ID, 
+                    tensorName(ID) ^ "= tf.nn.softmax(" ^ tensorName(ParentID) ^")")
+                 |head_c         => update (tfCommands, ID, 
+                    tensorName(ID) ^ ", _= tf.split("^tensorName(ParentID)^", ["^str(n)^", "^str(nParent-n)^"], axis=1)")
+                 |tail_c         => update (tfCommands, ID, 
+                    "_, "^tensorName(ID)^ "= tf.split("^tensorName(ParentID)^", ["^str(nParent-n)^", "^str(n)^"], axis=1)")
+                 |splitR_c       => update (tfCommands, ID, 
+                    tensorName(ID-1) ^ ", " ^ tensorName(ID) ^ "= tf.split("^tensorName(ParentID)^", ["^str(nParent-n)^", "^str(n)^"], axis=1)")
+                 |splitL_c       => update (tfCommands, ID, " ")
+                 |relu_c         => update (tfCommands, ID, 
+                    tensorName(ID) ^ "= tf.nn.relu("^tensorName(ParentID)^")")
+                 |tanh_c         => update (tfCommands, ID, 
+                    tensorName(ID) ^ "= tf.tanh("^tensorName(ParentID)^")")
+                 |sigmoid_c      => update (tfCommands, ID, 
+                    tensorName(ID) ^ "= tf.sigmoid("^tensorName(ParentID)^")")
+                 |sqrt_c         => update (tfCommands, ID, 
+                    tensorName(ID) ^ "= tf.sqrt("^tensorName(ParentID)^")")
+                 |dropout_c(r)   => update (tfCommands, ID, 
+                    tensorName(ID) ^ "= tf.nn.dropout("^tensorName(ParentID)^", keep_prob = "^Real.toString(r)^")")
+                 |_              => raise NotImplemented (*Only these operators have 1 parent tensor *)
+                )
+           |tfCommand (ID, Oper, n , Parents as c(tensor_cons(ParentID, _, _, OutDim), nil)) = (raise NotImplemented)
+           |tfCommand (ID, Oper, n, Parents as c(tensor_cons(ParentID1, _, _, _), c(tensor_cons(ParentID2, _, _, _), nil))) = 
+              (case Oper of
+                   concat_c      => update (tfCommands, ID, 
+                   tensorName(ID) ^ " = tf.concat ([" ^tensorName(ParentID1)^ ", " ^ tensorName(ParentID2) ^"], axis = 0)")
+                  |add_c         => update (tfCommands, ID, 
+                   tensorName(ID) ^ " = tf.add("^tensorName(ParentID1)^", "^tensorName(ParentID2)^")")
+                  |multiply_c    => update (tfCommands, ID, 
+                   tensorName(ID) ^ " = tf.multiply("^tensorName(ParentID1)^", "^tensorName(ParentID2)^")")
+                  |substract_c   => update (tfCommands, ID, 
+                   tensorName(ID) ^ " = tf.substract("^tensorName(ParentID1)^", "^tensorName(ParentID2)^")")
+                  | _            => raise NotImplemented (*Only these operators have 2 parent tensors*)   
               )
            | tfCommand (ID, Oper, n, Parents) =
               (case Oper of
-                  averageOutput_c => update (tfCommands, ID, "averageOutput_c dim_1: " ^ Int.toString(n) )
-                 | _              => raise NA1) (*Only these operators have a list of parents*)
+                  averageOutput_c => update (tfCommands, ID, 
+                  tensorName(ID) ^ " = tf.divide(tf.add_n("^listTensor(Parents)^"), " ^ str(len(Parents)) ^ ")")
+                 | _              => raise NotImplemented) (*Only these operators have a list of parents*)
+                 
+        
         fun tensorListToTfCommands (TensorList as nil) = ()
            |tensorListToTfCommands (TensorList as c(T, Ts)) = 
                 (tensorToTfCommand(T); tensorListToTfCommands(Ts))
@@ -276,12 +359,12 @@ fun convertTensorToTf ( FinalTensor as tensor_cons(ID, Parents, Oper, dim_1(n)))
                 ( case String.compare(sub(tfCommands, ID), "") of
                       EQUAL => (tfCommand(ID, Oper, n, Parents); tensorListToTfCommands(Parents))
                      |_  => () )
-           |tensorToTfCommand (_) =  raise NA1 (*Do not support dim > 1 *)
+           |tensorToTfCommand (_) =  raise NotImplemented (*Do not support dim > 1 *)
             
     in
         (tensorToTfCommand(FinalTensor); appi println tfCommands)
     end
- | convertTensorToTf ( _ ) = raise NA1; (* Do not support dim > 1 now *)
+ | convertTensorToTf ( _ ) = raise NotImplemented; (* Do not support dim > 1 now *)
 
 resetId();
 val inputTensor = tensor_c(nil, placeholder_c, dim_1(20));
