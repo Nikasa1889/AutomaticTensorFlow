@@ -1,20 +1,24 @@
 !_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
-CHECK	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	25;"	d	language:C++
+CHECK	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	26;"	d	language:C++
 COMMON_H_	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	2;"	d	language:C++
 EQ	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^mqd_t EQ;$/;"	v	language:C++
 eq_buffer	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^char eq_buffer[EQ_MAX_SIZE + 1];$/;"	v	language:C++
-eq_evaluate	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^float eq_evaluate(char *buffer, int msg_len){$/;"	f	language:C++
 eq_evaluate	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.sig	/^  val eq_evaluate: string -> real$/;"	v	language:SML
 EQ_MAX_MSG	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	6;"	d	language:C++
 EQ_MAX_SIZE	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	5;"	d	language:C++
 EQ_NAME	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	4;"	d	language:C++
-eq_open_write	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int eq_open_write(){$/;"	f	language:C++
-eq_send	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int eq_send(char *buffer, int msg_len){$/;"	f	language:C++
+eq_open_read	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int eq_open_read();$/;"	p	language:C++	file:
+eq_open_write	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int eq_open_write();$/;"	p	language:C++	file:
+eq_receive	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^struct Req eq_receive();$/;"	p	language:C++	file:
+eq_send	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int eq_send(Req *req);$/;"	p	language:C++	file:
 MQUEUE	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.sig	/^signature MQUEUE =$/;"	s	language:SML
 MQUEUE_ERROR	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.sig	/^  exception MQUEUE_ERROR$/;"	e	language:SML
 program	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^  char program[EQ_MAX_SIZE-20];$/;"	m	language:C++	struct:Req
 Req	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^typedef struct Req$/;"	s	language:C++
+Req	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^} Req;$/;"	t	language:C++	typeref:struct:Req
+requestEvaluator	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^float requestEvaluator(char * program, int length){$/;"	f	language:C++
 Res	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^typedef struct Res$/;"	s	language:C++
+Res	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^} Res;$/;"	t	language:C++	typeref:struct:Res
 result	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^  float result;$/;"	m	language:C++	struct:Res
 RQ	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^mqd_t RQ;$/;"	v	language:C++
 rq_buffer	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^char rq_buffer[RQ_MAX_SIZE + 1];$/;"	v	language:C++
@@ -23,6 +27,8 @@ RQ_MAX_SIZE	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	9;"	d	languag
 rq_name	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	/^  char rq_name[RQ_NAME_MAX];$/;"	m	language:C++	struct:Req
 RQ_NAME	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^char RQ_NAME[RQ_NAME_MAX];$/;"	v	language:C++
 RQ_NAME_MAX	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	12;"	d	language:C++
-rq_open_read	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int rq_open_read(){$/;"	f	language:C++
+rq_open_read	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int rq_open_read();$/;"	p	language:C++	file:
+rq_open_write	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int rq_open_write();$/;"	p	language:C++	file:
 RQ_PREFIX	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/common.h	8;"	d	language:C++
-rq_read	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^float rq_read(){$/;"	f	language:C++
+rq_receive	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^struct Res rq_receive();$/;"	p	language:C++	file:
+rq_send	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/mqueue.c	/^int rq_send(Res *res);$/;"	p	language:C++	file:
