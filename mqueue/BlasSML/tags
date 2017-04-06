@@ -1,0 +1,69 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+addMatrixInt	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val addMatrixInt:   int matrix * int matrix -> int matrix$/;"	v	language:SML
+addMatrixReal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val addMatrixReal:  real matrix * real matrix -> real matrix$/;"	v	language:SML
+addScalarInt	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val addScalarInt:      int matrix * int -> int matrix$/;"	v	language:SML
+addScalarReal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val addScalarReal:     real matrix * real -> real matrix$/;"	v	language:SML
+dappCe	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappCe: vector -> unit$/;"	v	language:SML
+dappDSigm	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappDSigm: vector -> unit$/;"	v	language:SML
+dappDTanh	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappDTanh: vector -> unit$/;"	v	language:SML
+dappExp	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappExp: vector -> unit$/;"	v	language:SML
+dappHSquare	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappHSquare: vector -> unit$/;"	v	language:SML
+dappInvr	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappInvr: vector -> unit$/;"	v	language:SML
+dappMinusLn	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappMinusLn: vector -> unit$/;"	v	language:SML
+dappSigm	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappSigm: vector -> unit$/;"	v	language:SML
+dappTanh	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dappTanh: vector -> unit$/;"	v	language:SML
+daxpy	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val daxpy: real * vector * vector -> unit$/;"	v	language:SML
+dcopy	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dcopy: vector -> vector$/;"	v	language:SML
+ddot	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val ddot: vector * vector -> real$/;"	v	language:SML
+dgemm	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dgemm: isTrans * isTrans * real * matrix * matrix * real * matrix -> unit$/;"	v	language:SML
+dgemv	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dgemv: isTrans * real * matrix * vector * real * vector -> unit$/;"	v	language:SML
+dnrm2	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dnrm2: vector -> real$/;"	v	language:SML
+dotmul	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dotmul: vector * vector -> vector$/;"	v	language:SML
+dotMulMatrixInt	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val dotMulMatrixInt:   int matrix * int matrix -> int matrix$/;"	v	language:SML
+dotMulMatrixReal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val dotMulMatrixReal:  real matrix * real matrix -> real matrix$/;"	v	language:SML
+drepcols	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val drepcols: vector * int -> matrix$/;"	v	language:SML
+dreprows	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dreprows: vector * int -> matrix$/;"	v	language:SML
+dscal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dscal: real * vector -> unit$/;"	v	language:SML
+dset	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dset: vector * real -> unit$/;"	v	language:SML
+dsum	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val dsum: vector -> real$/;"	v	language:SML
+eq	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val eq:   vector * vector -> bool$/;"	v	language:SML
+eqcount	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val eqcount: vector * vector -> int$/;"	v	language:SML
+foldl	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val foldl:             (('a*'b) -> 'b) -> 'b -> ('a matrix) -> 'b vector$/;"	v	language:SML
+freeMat	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val freeMat:     matrix -> unit$/;"	v	language:SML
+freeVec	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val freeVec:     vector -> unit$/;"	v	language:SML
+fromList2Vec	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val fromList2Vec: real list -> vector$/;"	v	language:SML
+fromLists	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  val fromLists: real list list * (int * int) -> matrix$/;"	v	language:SML
+fromVec	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  val fromVec:    vector * (int * int) -> matrix$/;"	v	language:SML
+isTrans	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	datatype isTrans = TRANS|NOTRANS$/;"	t	language:SML
+map	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val map:               ('a -> 'b) -> 'a matrix -> 'b matrix$/;"	v	language:SML
+matrix	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  type matrix$/;"	t	language:SML
+MATRIX	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^signature MATRIX =$/;"	s	language:SML
+maxCols	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val maxCols: matrix * vector -> unit$/;"	v	language:SML
+maxColsIdx	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val maxColsIdx: matrix * vector -> unit$/;"	v	language:SML
+mdaxpy	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val mdaxpy: real * matrix * matrix -> unit$/;"	v	language:SML
+mdcopy	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val mdcopy: matrix -> matrix$/;"	v	language:SML
+mdotmul	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val mdotmul: matrix * matrix -> matrix$/;"	v	language:SML
+mdscal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val mdscal: real * matrix -> unit$/;"	v	language:SML
+mdscalRows	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val mdscalRows: matrix * vector -> unit$/;"	v	language:SML
+mdset	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val mdset: matrix * real -> unit$/;"	v	language:SML
+meq	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val meq: matrix * matrix -> bool$/;"	v	language:SML
+merge	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val merge:             (('a*'b)->'c) -> ('a matrix * 'b matrix) -> 'c matrix$/;"	v	language:SML
+mulMatrixIntC	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val mulMatrixIntC:      int matrix * int matrix -> int matrix$/;"	v	language:SML
+mulMatrixIntR	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val mulMatrixIntR:      int matrix * int matrix -> int matrix$/;"	v	language:SML
+mulMatrixRealC	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val mulMatrixRealC:     real matrix * real matrix -> real matrix$/;"	v	language:SML
+mulMatrixRealR	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val mulMatrixRealR:     real matrix * real matrix -> real matrix$/;"	v	language:SML
+mulScalarInt	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val mulScalarInt:      int matrix * int -> int matrix$/;"	v	language:SML
+mulScalarReal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val mulScalarReal:     real matrix * real -> real matrix$/;"	v	language:SML
+newMat	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  val newMat:     int * int -> matrix$/;"	v	language:SML
+newVec	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val newVec:		int -> vector$/;"	v	language:SML
+printMat	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  val printMat:  matrix -> unit$/;"	v	language:SML
+printVec	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val printVec:  vector -> unit$/;"	v	language:SML
+size	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  val size:          matrix -> int * int$/;"	v	language:SML
+sumAll	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val sumAll: matrix -> real$/;"	v	language:SML
+sumCols	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val sumCols: matrix * vector -> unit$/;"	v	language:SML
+sumInt	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val sumInt:            (int matrix) -> int vector$/;"	v	language:SML
+sumReal	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^    val sumReal:           (real matrix) -> real vector$/;"	v	language:SML
+sumRows	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val sumRows: matrix * vector -> unit$/;"	v	language:SML
+toVector	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^	val toVector:      matrix -> vector$/;"	v	language:SML
+UnmatchedDimension	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  exception UnmatchedDimension$/;"	e	language:SML
+vector	/home/nikasa/ADATE/AutomaticTensorFlow/mqueue/BlasSML/matrix.sig	/^  type vector$/;"	t	language:SML

@@ -1,0 +1,13 @@
+ann 
+	"allowFFI true"
+in
+
+local
+	$(SML_LIB)/smlnj-lib/Util/smlnj-lib.mlb
+	$(SML_LIB)/basis/basis.mlb
+	$(SML_LIB)/basis/mlton.mlb
+	matrix.mlb
+	testMatrix.sml
+in
+end
+end
